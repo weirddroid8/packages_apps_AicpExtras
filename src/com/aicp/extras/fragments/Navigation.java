@@ -32,6 +32,7 @@ import androidx.preference.SwitchPreference;
 
 import com.aicp.extras.BaseSettingsFragment;
 import com.aicp.extras.R;
+import com.aicp.extras.preference.ActionFragment;
 import com.aicp.extras.preference.SystemSettingMasterSwitchPreference;
 import com.aicp.gear.preference.SeekBarPreferenceCham;
 
@@ -39,8 +40,8 @@ import com.android.internal.util.aicp.DeviceUtils;
 import com.android.internal.util.hwkeys.ActionConstants;
 import com.android.internal.util.hwkeys.ActionUtils;
 
-public class Navigation extends BaseSettingsFragment implements
-            Preference.OnPreferenceChangeListener {
+public class Navigation extends ActionFragment implements
+            OnPreferenceChangeListener {
 
     private static final String KEY_KILLAPP_LONGPRESS_BACK = "kill_app_longpress_back";
     private static final String KEY_SWAP_HW_NAVIGATION_KEYS = "swap_navigation_keys";
@@ -53,6 +54,11 @@ public class Navigation extends BaseSettingsFragment implements
 
     private static final String CATEGORY_HWKEY = "hardware_keys";
     private static final String CATEGORY_WAKE = "wake_keys";
+    private static final String CATEGORY_HOME = "home_key";
+    private static final String CATEGORY_MENU = "menu_key";
+    private static final String CATEGORY_BACK = "back_key";
+    private static final String CATEGORY_ASSIST = "assist_key";
+    private static final String CATEGORY_APPSWITCH = "app_switch_key";
 
     // Masks for checking presence of hardware keys.
     // Must match values in frameworks/base/core/res/res/values/config.xml
@@ -182,6 +188,11 @@ public class Navigation extends BaseSettingsFragment implements
             } else {
                 mWakeKeysCategory.setVisible(true);
             }
+        // let super know we can load ActionPreferences
+        onPreferenceScreenLoaded(ActionConstants.getDefaults(ActionConstants.HWKEYS));
+
+        // load preferences first
+        setActionPreferencesEnabled(keysDisabled == 0);
         }
         if (navigationBarEnabled) {
             updateHWKeysVisibility(false);
@@ -285,5 +296,13 @@ public class Navigation extends BaseSettingsFragment implements
             return true;
         }
         return false;
+    }
+    @Override
+    protected boolean usesExtendedActionsList() {
+        return true;
+    }
+    @Override
+    public int getMetricsCategory() {
+        return MetricsProto.MetricsEvent.AICP_METRICS;
     }
 }
